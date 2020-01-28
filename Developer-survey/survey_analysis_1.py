@@ -28,14 +28,10 @@ with open('survey_results_public.csv', 'r', encoding='utf-8') as f:
         employment[line['Employment']] += 1
 
         # Подсчитываем выполняемые респондентами функции:
-        positions = line['DevType'].split(';')
-        for position in positions:
-            job[position] += 1
+        job.update(line['DevType'].split(';'))
 
         # Подсчитываем используемые языки программирования:
-        lang = line['LanguageWorkedWith'].split(';')
-        for language in lang:
-            languages[language] += 1
+        languages.update(line['LanguageWorkedWith'].split(';'))
 
 print("Анализ 'Stack Overflow Developer Survey 2019':")
 print('\tколичество респондентов: {}'.format(total))
