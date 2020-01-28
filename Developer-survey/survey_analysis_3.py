@@ -18,8 +18,7 @@ income_experience = survey[['YearsCodePro', 'ConvertedComp']].groupby('YearsCode
 income_experience_p = survey[survey.LanguageWorkedWith.str.contains('Python', na=False)]
 income_experience_p = income_experience_p[['YearsCodePro', 'ConvertedComp']].groupby('YearsCodePro').mean().round(0)
 
-# Визуализация:
-plt.style.use('seaborn-poster')
+plt.style.use('fivethirtyeight')
 plt.plot(income_experience_p.index, income_experience_p.ConvertedComp, label='Python Developers')
 plt.plot(income_experience.index, income_experience.ConvertedComp, label='All Developers')
 plt.title('Average Developer Salaries by Age')
@@ -43,8 +42,22 @@ lang_response.sort_values(by='Developers_N', ascending=False, inplace=True)
 total = survey['LanguageWorkedWith'].count()
 lang_response['Percentage'] = round(lang_response.Developers_N / total * 100, 2)
 
-# Визуализация:
-plt.barh(lang_response.index, lang_response.Percentage)
-plt.title("Usage of Programming Languages (%)")
-plt.tight_layout()
+fig, ax = plt.subplots()
+rows = ax.barh(lang_response.head(10).index, lang_response.head(10).Percentage)
+ax.set_title("Usage of Programming Languages (%)")
+
+
+def bar_labels(bars):
+    """Attach a text label to each bar in 'bars', displaying its value."""
+    for rect in bars:
+        width = rect.get_width()
+        ax.annotate('{}%'.format(width),
+                    xy=(width, rect.get_y()),
+                    xytext=(0, 10),
+                    textcoords="offset points",
+                    ha='right', va='center')
+
+
+bar_labels(rows)
+fig.tight_layout()
 plt.show()
