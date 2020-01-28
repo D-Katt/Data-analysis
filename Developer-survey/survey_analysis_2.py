@@ -4,48 +4,57 @@
 
 import numpy as np
 import pandas as pd
+from matplotlib import pyplot as plt
 
 # Считываем из csv-файла данные, необходимые для анализа:
 survey = pd.read_csv('survey_results_public.csv', usecols=['Respondent', 'Country',
                      'ConvertedComp', 'EdLevel', 'Employment', 'YearsCodePro', 'OrgSize'])
 
 # Общее количество респондентов и количество вопросов
-
 respondent_n, question_n = survey.shape
 print("Анализ 'Stack Overflow Developer Survey 2019':\n"
       "\tреспондентов: {}\n\tвопросов: {}".format(respondent_n, question_n))
 
 # Распределение респондентов по странам
+countries = survey.Country.value_counts(normalize=True)
+print('\nТоп-20 стран по количеству разработчиков (%):')
+print(countries.nlargest(20))
 
-# Подсчитываем значения в столбце 'Country' и из 20-ки крупнейших создаем новую таблицу:
-countries = pd.DataFrame(survey.Country.value_counts().nlargest(20))
-countries.columns = ['Developers_N']  # Переименовываем столбец
-total = survey.Country.count()  # Всего респондентов, указавших страну
-# Добавляем столбец с долей от общего числа разработчиков:
-countries['Percentage'] = round(countries['Developers_N'] / total * 100, 2)
-print('\nТоп-20 стран по количеству разработчиков:')
-print(countries)
+y = countries.nlargest(10).index
+x = countries.nlargest(10).tolist()
+
+plt.style.use('fivethirtyeight')
+plt.barh(y, x)
+plt.title("Developers by Country (%)")
+plt.tight_layout()
+plt.show()
 
 # Уровень дохода
-
-# Среднее значение по столбцу:
 print('\nСредний уровень дохода, долл. США в год:', int(np.mean(survey['ConvertedComp'])))
 
 # Средний доход по странам:
-income_country = survey[['ConvertedComp', 'Country']].groupby('Country').mean().round(0)
-income_country.sort_values('ConvertedComp', ascending=False, inplace=True)  # Сортировка по убыванию
+income_country = survey[['ConvertedComp', 'Country']].groupby('Country').mean().round(0).\
+    sort_values('ConvertedComp', ascending=False)
 print('\nСредний уровень дохода по странам:')
 print(income_country.head(20))
 
+y = income_country.head(10).index
+x = income_country.head(10).ConvertedComp.tolist()
+
+plt.barh(y, x)
+plt.title("Average income by Country (USD)")
+plt.tight_layout()
+plt.show()
+
 # Средний доход в зависимости от уровня образования:
-income_education = survey[['ConvertedComp', 'EdLevel']].groupby('EdLevel').mean().round(0)
-income_education.sort_values('ConvertedComp', ascending=False, inplace=True)
+income_education = survey[['ConvertedComp', 'EdLevel']].groupby('EdLevel').mean().round(0).\
+    sort_values('ConvertedComp', ascending=False)
 print('\nСредний доход в зависимости от уровня образования:')
 print(income_education)
 
 # Средний доход в зависимости от типа занятости:
-income_employment = survey[['ConvertedComp', 'Employment']].groupby('Employment').mean().round(0)
-income_employment.sort_values('ConvertedComp', ascending=False, inplace=True)
+income_employment = survey[['ConvertedComp', 'Employment']].groupby('Employment').mean().round(0).\
+    sort_values('ConvertedComp', ascending=False)
 print('\nСредний доход в зависимости от типа занятости:')
 print(income_employment)
 
@@ -73,8 +82,8 @@ print('\nКоэффициент корреляции (доход / опыт ра
 
 # Средний доход в зависимости от размера компании:
 
-income_company = survey[['ConvertedComp', 'OrgSize']].groupby('OrgSize').mean().round(0)
-income_company.sort_values('ConvertedComp', ascending=False, inplace=True)
+income_company = survey[['ConvertedComp', 'OrgSize']].groupby('OrgSize').mean().round(0).\
+    sort_values('ConvertedComp', ascending=False)
 print('\nСредний уровень дохода в зависимости от размера компании:')
 print(income_company)
 
@@ -83,8 +92,8 @@ print(income_company)
 income_Russia = survey[survey.Country == 'Russian Federation']
 print('\nСредний уровень дохода в России, долл. США в год:', int(income_Russia.ConvertedComp.mean()))
 
-education_Russia = income_Russia[['ConvertedComp', 'EdLevel']].groupby('EdLevel').mean().round(0)
-education_Russia.sort_values('ConvertedComp', ascending=False, inplace=True)
+education_Russia = income_Russia[['ConvertedComp', 'EdLevel']].groupby('EdLevel').mean().round(0).\
+    sort_values('ConvertedComp', ascending=False)
 print('\nСредний доход в России в зависимости от уровня образования:')
 print(education_Russia)
 
@@ -105,11 +114,11 @@ print('\t\tв том числе с опытом работы более 5 лет
             ['ConvertedComp'].corr(income_Russia.YearsCodePro), 3))
 
 print('\nСредний доход в России в зависимости от уровня образования и опыта работы:')
-with pd.option_context('display.precision', 0):
+with pd.option_context('display.precision', 0, 'display.max_columns', 7):
     print(pd.DataFrame(income_Russia.pivot_table(index='EdLevel', columns='Years_group',
                               values='ConvertedComp', aggfunc='mean', margins=True)))
 
-company_Russia = income_Russia[['ConvertedComp', 'OrgSize']].groupby('OrgSize').mean().round(0)
-company_Russia.sort_values('ConvertedComp', ascending=False, inplace=True)
+company_Russia = income_Russia[['ConvertedComp', 'OrgSize']].groupby('OrgSize').mean().round(0).\
+    sort_values('ConvertedComp', ascending=False)
 print('\nСредний доход в России в зависимости от размера компании:')
 print(company_Russia)
