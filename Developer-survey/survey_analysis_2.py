@@ -23,11 +23,11 @@ print(countries.nlargest(20))
 y = countries.nlargest(10).index
 x = countries.nlargest(10).tolist()
 
-plt.style.use('fivethirtyeight')
-plt.barh(y, x)
-plt.title("Developers by Country (%)")
-plt.tight_layout()
-plt.show()
+plt.style.use('seaborn-whitegrid')
+
+fig1, ax1 = plt.subplots()
+rows1 = ax1.barh(y, x)
+ax1.set_title("Developers by Country (%)")
 
 # Уровень дохода
 print('\nСредний уровень дохода, долл. США в год:', int(np.mean(survey['ConvertedComp'])))
@@ -41,8 +41,10 @@ print(income_country.head(20))
 y = income_country.head(10).index
 x = income_country.head(10).ConvertedComp.tolist()
 
-plt.barh(y, x)
-plt.title("Average income by Country (USD)")
+fig2, ax2 = plt.subplots()
+rows2 = ax2.barh(y, x)
+ax2.set_title("Average Income by Country (USD)")
+
 plt.tight_layout()
 plt.show()
 
